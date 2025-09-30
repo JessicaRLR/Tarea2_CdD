@@ -291,6 +291,40 @@ plt.ylabel("Actual")
 plt.tight_layout()
 plt.show()
 
+# Graficamos el mejor k por AUC
+final_k = best_k_auc
+print(f"\n>>> Refitting final kNN with k={final_k}")
+
+final_knn = Pipeline(
+    [("preproc", preprocessor), ("clf", KNeighborsClassifier(n_neighbors=final_k))]
+)
+final_knn.fit(X_train, y_train)
+y_pred_final = final_knn.predict(X_test)
+y_proba_final = final_knn.predict_proba(X_test)[:, 1]
+
+# Metrics
+print("\nFinal kNN Classification Report:")
+print(classification_report(y_test, y_pred_final))
+print("ROC AUC:", roc_auc_score(y_test, y_proba_final))
+
+# Confusion matrix
+cm = confusion_matrix(y_test, y_pred_final)
+plt.figure(figsize=(4, 3))
+sns.heatmap(
+    cm,
+    annot=True,
+    fmt="d",
+    cmap="Blues",
+    cbar=False,
+    xticklabels=["Pred: No", "Pred: Yes"],
+    yticklabels=["True: No", "True: Yes"],
+)
+plt.title(f"Confusion Matrix - kNN (k={final_k})")
+plt.xlabel("Predicted")
+plt.ylabel("Actual")
+plt.tight_layout()
+plt.show()
+
 # Gráfica de Proyecciones 1D del Criterio de Fisher
 fisher_pipe = Pipeline(
     [("preproc", preprocessor), ("fisher", LinearDiscriminantAnalysis(n_components=1))]
