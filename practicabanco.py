@@ -26,6 +26,12 @@ plt.ylabel("Frecuencia")
 plt.tight_layout()
 plt.show()
 
+# Calculamos el porcentaje de datos faltantes "unknown" por columna
+unknown_percentages = (data == "unknown").sum() / len(data) * 100
+
+print("Percentage of 'unknown' values per column:")
+print(unknown_percentages)
+
 # Generamos un dataframe de los datos correspondientes a yes
 datayes = data.loc[data["y"] == "yes"]
 
@@ -44,6 +50,14 @@ plt.show()
 zero_previous_count = len(data.loc[data["previous"] > 0])
 
 print(f"Número de filas en donde 'previous' es > 0: {zero_previous_count}")
+print(
+    f"Proporción de filas en donde 'previous' es > 0: {zero_previous_count/len(data)}"
+)
+
+# Contamos cuántas filas tienen un valor de 'previous' igual a -1
+no_previous_count = len(data.loc[data["previous"] == -1])
+
+print(f"Número de filas en donde 'previous' es -1: {no_previous_count}")
 
 # Hacemos histogramas para las personas que dijeron que sí
 for col in datayes.columns:
@@ -73,6 +87,23 @@ data.loc[unknown_education_mask, "education"] = np.random.choice(
 )
 plt.hist(data["education"])
 plt.title("Distribución de Educación Imputada")
+plt.show()
+
+# Imputamos trabajo con una muestra aleatoria de los valores conocidos
+unknown_job_mask = data["job"] == "unknown"
+known_job_values = data.loc[~unknown_job_mask, "job"]
+data.loc[unknown_job_mask, "job"] = np.random.choice(
+    known_job_values, size=unknown_job_mask.sum(), replace=True
+)
+
+job_counts = data["job"].value_counts()
+plt.figure(figsize=(10, 6))
+plt.bar(job_counts.index, job_counts.values)
+plt.xticks(rotation="vertical")
+plt.title("Distribución de Trabajos Imputada")
+plt.xlabel("Trabajo")
+plt.ylabel("Frecuencia")
+plt.tight_layout()
 plt.show()
 
 # Entrenamos y validamos clasificadores
