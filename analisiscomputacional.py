@@ -610,67 +610,120 @@ for n in sample_sizes:
 
         bayes_model = BayesClassifierWrapper(mu0, Sigma0, pi0, mu1, Sigma1, pi1)
 
+        true_risk_bayes = calculate_true_risk(
+            bayes_model, mu0, Sigma0, pi0, mu1, Sigma1, pi1
+        )
+        cv_risk_bayes = estimate_risk_cv(
+            BayesClassifierWrapper(mu0, Sigma0, pi0, mu1, Sigma1, pi1), X_sim, y_sim
+        )
+        bootstrap_risk_bayes_0632, bootstrap_risk_bayes_0632_plus = (
+            estimate_risk_bootstrap(
+                BayesClassifierWrapper(mu0, Sigma0, pi0, mu1, Sigma1, pi1), X_sim, y_sim
+            )
+        )
 
-        true_risk_bayes = calculate_true_risk(bayes_model, mu0, Sigma0, pi0, mu1, Sigma1, pi1)
-        cv_risk_bayes = estimate_risk_cv(BayesClassifierWrapper(mu0, Sigma0, pi0, mu1, Sigma1, pi1), X_sim, y_sim)
-        bootstrap_risk_bayes_0632, bootstrap_risk_bayes_0632_plus = estimate_risk_bootstrap(BayesClassifierWrapper(mu0, Sigma0, pi0, mu1, Sigma1, pi1), X_sim, y_sim)
-
-        simulation_results.append({
-            'model': 'Optimal Bayes',
-            'n': n,
-            'replication': r,
-            'k': None, 
-            'true_risk': true_risk_bayes,
-            'cv_risk': cv_risk_bayes,
-            'bootstrap_0632_risk': bootstrap_risk_bayes_0632,
-            'bootstrap_0632_plus_risk': bootstrap_risk_bayes_0632_plus
-        })
-
+        simulation_results.append(
+            {
+                "model": "Optimal Bayes",
+                "n": n,
+                "replication": r,
+                "k": None,
+                "true_risk": true_risk_bayes,
+                "cv_risk": cv_risk_bayes,
+                "bootstrap_0632_risk": bootstrap_risk_bayes_0632,
+                "bootstrap_0632_plus_risk": bootstrap_risk_bayes_0632_plus,
+            }
+        )
 
         nb_model = GaussianNB()
         nb_model.fit(X_sim, y_sim)
         true_risk_nb = calculate_true_risk(nb_model, mu0, Sigma0, pi0, mu1, Sigma1, pi1)
         cv_risk_nb = estimate_risk_cv(GaussianNB(), X_sim, y_sim)
-        bootstrap_risk_nb_0632, bootstrap_risk_nb_0632_plus = estimate_risk_bootstrap(GaussianNB(), X_sim, y_sim)
-        simulation_results.append({
-            'model': 'Naive Bayes', 'n': n, 'replication': r, 'k': None,
-            'true_risk': true_risk_nb, 'cv_risk': cv_risk_nb,
-            'bootstrap_0632_risk': bootstrap_risk_nb_0632, 'bootstrap_0632_plus_risk': bootstrap_risk_nb_0632_plus
-        })
-
+        bootstrap_risk_nb_0632, bootstrap_risk_nb_0632_plus = estimate_risk_bootstrap(
+            GaussianNB(), X_sim, y_sim
+        )
+        simulation_results.append(
+            {
+                "model": "Naive Bayes",
+                "n": n,
+                "replication": r,
+                "k": None,
+                "true_risk": true_risk_nb,
+                "cv_risk": cv_risk_nb,
+                "bootstrap_0632_risk": bootstrap_risk_nb_0632,
+                "bootstrap_0632_plus_risk": bootstrap_risk_nb_0632_plus,
+            }
+        )
 
         lda_model = LinearDiscriminantAnalysis()
         lda_model.fit(X_sim, y_sim)
-        true_risk_lda = calculate_true_risk(lda_model, mu0, Sigma0, pi0, mu1, Sigma1, pi1)
+        true_risk_lda = calculate_true_risk(
+            lda_model, mu0, Sigma0, pi0, mu1, Sigma1, pi1
+        )
         cv_risk_lda = estimate_risk_cv(LinearDiscriminantAnalysis(), X_sim, y_sim)
-        bootstrap_risk_lda_0632, bootstrap_risk_lda_0632_plus = estimate_risk_bootstrap(LinearDiscriminantAnalysis(), X_sim, y_sim)
-        simulation_results.append({
-            'model': 'LDA', 'n': n, 'replication': r, 'k': None,
-            'true_risk': true_risk_lda, 'cv_risk': cv_risk_lda,
-            'bootstrap_0632_risk': bootstrap_risk_lda_0632, 'bootstrap_0632_plus_risk': bootstrap_risk_lda_0632_plus
-        })
+        bootstrap_risk_lda_0632, bootstrap_risk_lda_0632_plus = estimate_risk_bootstrap(
+            LinearDiscriminantAnalysis(), X_sim, y_sim
+        )
+        simulation_results.append(
+            {
+                "model": "LDA",
+                "n": n,
+                "replication": r,
+                "k": None,
+                "true_risk": true_risk_lda,
+                "cv_risk": cv_risk_lda,
+                "bootstrap_0632_risk": bootstrap_risk_lda_0632,
+                "bootstrap_0632_plus_risk": bootstrap_risk_lda_0632_plus,
+            }
+        )
 
         qda_model = QuadraticDiscriminantAnalysis()
         qda_model.fit(X_sim, y_sim)
-        true_risk_qda = calculate_true_risk(qda_model, mu0, Sigma0, pi0, mu1, Sigma1, pi1)
+        true_risk_qda = calculate_true_risk(
+            qda_model, mu0, Sigma0, pi0, mu1, Sigma1, pi1
+        )
         cv_risk_qda = estimate_risk_cv(QuadraticDiscriminantAnalysis(), X_sim, y_sim)
-        bootstrap_risk_qda_0632, bootstrap_risk_qda_0632_plus = estimate_risk_bootstrap(QuadraticDiscriminantAnalysis(), X_sim, y_sim)
-        simulation_results.append({
-            'model': 'QDA', 'n': n, 'replication': r, 'k': None,
-            'true_risk': true_risk_qda, 'cv_risk': cv_risk_qda,
-            'bootstrap_0632_risk': bootstrap_risk_qda_0632, 'bootstrap_0632_plus_risk': bootstrap_risk_qda_0632_plus
-        })
+        bootstrap_risk_qda_0632, bootstrap_risk_qda_0632_plus = estimate_risk_bootstrap(
+            QuadraticDiscriminantAnalysis(), X_sim, y_sim
+        )
+        simulation_results.append(
+            {
+                "model": "QDA",
+                "n": n,
+                "replication": r,
+                "k": None,
+                "true_risk": true_risk_qda,
+                "cv_risk": cv_risk_qda,
+                "bootstrap_0632_risk": bootstrap_risk_qda_0632,
+                "bootstrap_0632_plus_risk": bootstrap_risk_qda_0632_plus,
+            }
+        )
 
-        knn_weighted_model = KNeighborsClassifier(n_neighbors=5, weights='distance')
+        knn_weighted_model = KNeighborsClassifier(n_neighbors=5, weights="distance")
         knn_weighted_model.fit(X_sim, y_sim)
-        true_risk_knn_weighted = calculate_true_risk(knn_weighted_model, mu0, Sigma0, pi0, mu1, Sigma1, pi1)
-        cv_risk_knn_weighted = estimate_risk_cv(KNeighborsClassifier(n_neighbors=5, weights='distance'), X_sim, y_sim)
-        bootstrap_risk_knn_weighted_0632, bootstrap_risk_knn_weighted_0632_plus = estimate_risk_bootstrap(KNeighborsClassifier(n_neighbors=5, weights='distance'), X_sim, y_sim)
-        simulation_results.append({
-            'model': 'Weighted k-NN (k=5)', 'n': n, 'replication': r, 'k': 5,
-            'true_risk': true_risk_knn_weighted, 'cv_risk': cv_risk_knn_weighted,
-            'bootstrap_0632_risk': bootstrap_risk_knn_weighted_0632, 'bootstrap_0632_plus_risk': bootstrap_risk_knn_weighted_0632_plus
-        })
+        true_risk_knn_weighted = calculate_true_risk(
+            knn_weighted_model, mu0, Sigma0, pi0, mu1, Sigma1, pi1
+        )
+        cv_risk_knn_weighted = estimate_risk_cv(
+            KNeighborsClassifier(n_neighbors=5, weights="distance"), X_sim, y_sim
+        )
+        bootstrap_risk_knn_weighted_0632, bootstrap_risk_knn_weighted_0632_plus = (
+            estimate_risk_bootstrap(
+                KNeighborsClassifier(n_neighbors=5, weights="distance"), X_sim, y_sim
+            )
+        )
+        simulation_results.append(
+            {
+                "model": "Weighted k-NN (k=5)",
+                "n": n,
+                "replication": r,
+                "k": 5,
+                "true_risk": true_risk_knn_weighted,
+                "cv_risk": cv_risk_knn_weighted,
+                "bootstrap_0632_risk": bootstrap_risk_knn_weighted_0632,
+                "bootstrap_0632_plus_risk": bootstrap_risk_knn_weighted_0632_plus,
+            }
+        )
 
         mu0_sim = np.mean(X_sim[y_sim == 0], axis=0)
         mu1_sim = np.mean(X_sim[y_sim == 1], axis=0)
@@ -695,12 +748,12 @@ for n in sample_sizes:
                 return (projections > threshold).astype(int)
 
             def fit(self, X, y):
-                 self.mu0 = np.mean(X[y == 0], axis=0)
-                 self.mu1 = np.mean(X[y == 1], axis=0)
-                 Sigma0 = np.cov(X[y == 0].T)
-                 Sigma1 = np.cov(X[y == 1].T)
-                 self.Sigma = (Sigma0 + Sigma1) / 2
-                 return self
+                self.mu0 = np.mean(X[y == 0], axis=0)
+                self.mu1 = np.mean(X[y == 1], axis=0)
+                Sigma0 = np.cov(X[y == 0].T)
+                Sigma1 = np.cov(X[y == 1].T)
+                self.Sigma = (Sigma0 + Sigma1) / 2
+                return self
 
             def get_params(self, deep=True):
                 return {"mu0": self.mu0, "mu1": self.mu1, "Sigma": self.Sigma}
@@ -710,41 +763,63 @@ for n in sample_sizes:
                     setattr(self, parameter, value)
                 return self
 
-
         fisher_model = FisherClassifierWrapper(mu0_sim, mu1_sim, Sigma_comb_sim)
 
-        true_risk_fisher = calculate_true_risk(fisher_model, mu0, Sigma0, pi0, mu1, Sigma1, pi1)
+        true_risk_fisher = calculate_true_risk(
+            fisher_model, mu0, Sigma0, pi0, mu1, Sigma1, pi1
+        )
 
-        cv_risk_fisher = estimate_risk_cv(FisherClassifierWrapper(None, None, None), X_sim, y_sim) 
-        bootstrap_risk_fisher_0632, bootstrap_risk_fisher_0632_plus = estimate_risk_bootstrap(FisherClassifierWrapper(None, None, None), X_sim, y_sim)
+        cv_risk_fisher = estimate_risk_cv(
+            FisherClassifierWrapper(None, None, None), X_sim, y_sim
+        )
+        bootstrap_risk_fisher_0632, bootstrap_risk_fisher_0632_plus = (
+            estimate_risk_bootstrap(
+                FisherClassifierWrapper(None, None, None), X_sim, y_sim
+            )
+        )
 
-
-        simulation_results.append({
-            'model': 'Fisher', 'n': n, 'replication': r, 'k': None,
-            'true_risk': true_risk_fisher, 'cv_risk': cv_risk_fisher,
-            'bootstrap_0632_risk': bootstrap_risk_fisher_0632, 'bootstrap_0632_plus_risk': bootstrap_risk_fisher_0632_plus
-        })
-
+        simulation_results.append(
+            {
+                "model": "Fisher",
+                "n": n,
+                "replication": r,
+                "k": None,
+                "true_risk": true_risk_fisher,
+                "cv_risk": cv_risk_fisher,
+                "bootstrap_0632_risk": bootstrap_risk_fisher_0632,
+                "bootstrap_0632_plus_risk": bootstrap_risk_fisher_0632_plus,
+            }
+        )
 
         for k in k_values:
             # Train k-NN
             knn_model = KNeighborsClassifier(n_neighbors=k)
             knn_model.fit(X_sim, y_sim)
 
-            true_risk_knn = calculate_true_risk(knn_model, mu0, Sigma0, pi0, mu1, Sigma1, pi1)
-            cv_risk_knn = estimate_risk_cv(KNeighborsClassifier(n_neighbors=k), X_sim, y_sim)
-            bootstrap_risk_knn_0632, bootstrap_risk_knn_0632_plus = estimate_risk_bootstrap(KNeighborsClassifier(n_neighbors=k), X_sim, y_sim)
+            true_risk_knn = calculate_true_risk(
+                knn_model, mu0, Sigma0, pi0, mu1, Sigma1, pi1
+            )
+            cv_risk_knn = estimate_risk_cv(
+                KNeighborsClassifier(n_neighbors=k), X_sim, y_sim
+            )
+            bootstrap_risk_knn_0632, bootstrap_risk_knn_0632_plus = (
+                estimate_risk_bootstrap(
+                    KNeighborsClassifier(n_neighbors=k), X_sim, y_sim
+                )
+            )
 
-            simulation_results.append({
-                'model': 'k-NN',
-                'n': n,
-                'replication': r,
-                'k': k,
-                'true_risk': true_risk_knn,
-                'cv_risk': cv_risk_knn,
-                'bootstrap_0632_risk': bootstrap_risk_knn_0632,
-                'bootstrap_0632_plus_risk': bootstrap_risk_knn_0632_plus
-            })
+            simulation_results.append(
+                {
+                    "model": "k-NN",
+                    "n": n,
+                    "replication": r,
+                    "k": k,
+                    "true_risk": true_risk_knn,
+                    "cv_risk": cv_risk_knn,
+                    "bootstrap_0632_risk": bootstrap_risk_knn_0632,
+                    "bootstrap_0632_plus_risk": bootstrap_risk_knn_0632_plus,
+                }
+            )
 
 df_simulation_results = pd.DataFrame(simulation_results)
 
@@ -777,10 +852,12 @@ import pandas as pd
 
 sns.set_theme(style="whitegrid")
 
-# 1. (L(g)) vs n por método
+
 plt.figure(figsize=(10, 6))
+
 for model_name in aggregated_results["model"].unique():
     if model_name == "k-NN":
+        # Plot multiple k values for k-NN
         for k_val in aggregated_results[aggregated_results["model"] == "k-NN"][
             "k"
         ].unique():
@@ -796,6 +873,7 @@ for model_name in aggregated_results["model"].unique():
                 label=f"{model_name} (k={k_val})",
             )
     else:
+        # Plot Optimal Bayes, Naive Bayes, LDA, QDA, Fisher, Weighted k-NN
         subset = aggregated_results[aggregated_results["model"] == model_name]
         plt.errorbar(
             subset["n"],
@@ -805,11 +883,14 @@ for model_name in aggregated_results["model"].unique():
             label=model_name,
         )
 
+
 plt.xlabel("Sample Size (n)")
 plt.ylabel("True Risk (L(g))")
 plt.title("Evolution of True Risk with Sample Size")
 plt.legend(title="Model")
 plt.xscale("log")
+plt.grid(True, which="both", linestyle="--", alpha=0.6)
+plt.tight_layout()
 plt.show()
 
 # 2. (L(k-NN)) vs k para diferentes n
@@ -832,7 +913,7 @@ plt.legend(title="Sample Size (n)")
 plt.show()
 
 
-# 3. Brechas L(Bayes) - L(g) vs n
+# 3. Brechas L(Bayes) - L(g) vs n para kNN
 bayes_true_risk_means = aggregated_results[
     aggregated_results["model"] == "Optimal Bayes"
 ].set_index("n")["true_risk_mean"]
@@ -852,5 +933,36 @@ plt.xlabel("Sample Size (n)")
 plt.ylabel("True Risk Gap (L(Optimal Bayes) - L(k-NN))")
 plt.title("True Risk Gap between Optimal Bayes and k-NN vs Sample Size")
 plt.legend(title="k for k-NN")
+plt.xscale("log")
+plt.show()
+
+# 4. Brechas todos los modelos
+plt.figure(figsize=(10, 6))
+for model_name in aggregated_results["model"].unique():
+    if model_name != "Optimal Bayes":
+        if model_name == "k-NN":
+
+            for k_val in aggregated_results[aggregated_results["model"] == "k-NN"][
+                "k"
+            ].unique():
+                subset = aggregated_results[
+                    (aggregated_results["model"] == model_name)
+                    & (aggregated_results["k"] == k_val)
+                ]
+                plt.plot(
+                    subset["n"],
+                    subset["true_risk_gap_mean"],
+                    "-o",
+                    label=f"{model_name} (k={k_val})",
+                )
+        else:
+
+            subset = aggregated_results[aggregated_results["model"] == model_name]
+            plt.plot(subset["n"], subset["true_risk_gap_mean"], "-o", label=model_name)
+
+plt.xlabel("Sample Size (n)")
+plt.ylabel("True Risk Gap (L(Optimal Bayes) - L(g))")
+plt.title("True Risk Gap between Optimal Bayes and Other Models vs Sample Size")
+plt.legend(title="Model")
 plt.xscale("log")
 plt.show()
