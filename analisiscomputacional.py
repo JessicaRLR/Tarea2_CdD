@@ -966,3 +966,84 @@ plt.title("True Risk Gap between Optimal Bayes and Other Models vs Sample Size")
 plt.legend(title="Model")
 plt.xscale("log")
 plt.show()
+
+# Comparación de L_{CV} vs L_g
+import matplotlib.pyplot as plt
+import seaborn as sns
+import pandas as pd
+
+comparison_data = []
+for index, row in aggregated_results.iterrows():
+    model_name = row["model"]
+    n_val = row["n"]
+    k_val = row["k"] if pd.notna(row["k"]) else "N/A"
+
+    true_risk_mean = row["true_risk_mean"]
+    true_risk_std = row["true_risk_std"]
+
+    comparison_data.append(
+        {
+            "model": model_name,
+            "n": n_val,
+            "k": k_val,
+            "method": "True (Monte Carlo)",
+            "risk_mean": true_risk_mean,
+            "risk_std": true_risk_std,
+        }
+    )
+    comparison_data.append(
+        {
+            "model": model_name,
+            "n": n_val,
+            "k": k_val,
+            "method": "CV",
+            "risk_mean": row["cv_risk_mean"],
+            "risk_std": row["cv_risk_std"],
+        }
+    )
+    comparison_data.append(
+        {
+            "model": model_name,
+            "n": n_val,
+            "k": k_val,
+            "method": "Bootstrap .632",
+            "risk_mean": row["bootstrap_0632_risk_mean"],
+            "risk_std": row["bootstrap_0632_risk_std"],
+        }
+    )
+    comparison_data.append(
+        {
+            "model": model_name,
+            "n": n_val,
+            "k": k_val,
+            "method": "Bootstrap .632+",
+            "risk_mean": row["bootstrap_0632_plus_risk_mean"],
+            "risk_std": row["bootstrap_0632_plus_risk_std"],
+        }
+    )
+
+df_comparison = pd.DataFrame(comparison_data)
+
+plt.figure(figsize=(12, 8))
+sns.scatterplot(
+    data=df_comparison,
+    x="risk_mean",
+    y="risk_mean",
+    hue="method",
+    style="model",
+    size="n",
+    sizes=(50, 200),
+    alpha=0.7,
+)
+
+max_risk = df_comparison["risk_mean"].max() * 1.1
+plt.plot([0, max_risk], [0, max_risk], "k--", lw=1, label="Perfect Agreement")
+
+
+plt.xlabel("True Risk (L(g)) - Mean over Replications")
+plt.ylabel("Estimated Risk - Mean over Replications")
+plt.title("Comparison of Estimated Risk vs True Risk")
+plt.legend(title="Method / Model / n")
+plt.xlim(0, max_risk)
+plt.ylim(0, max_risk)
+plt.show()
