@@ -588,9 +588,12 @@ print(f"k values for k-NN: {k_values}")
 # Inicializamos las simulaciones
 simulation_results = []
 
+
 for n in sample_sizes:
     print(f"Simulating for n = {n}")
+
     for r in range(num_replications):
+
         X_sim = []
         y_sim = []
         for i in range(n):
@@ -605,63 +608,143 @@ for n in sample_sizes:
         X_sim = np.array(X_sim)
         y_sim = np.array(y_sim)
 
-        # Modelo óptimo de Bayes
         bayes_model = BayesClassifierWrapper(mu0, Sigma0, pi0, mu1, Sigma1, pi1)
 
-        true_risk_bayes = calculate_true_risk(
-            bayes_model, mu0, Sigma0, pi0, mu1, Sigma1, pi1
-        )
-        cv_risk_bayes = estimate_risk_cv(
-            BayesClassifierWrapper(mu0, Sigma0, pi0, mu1, Sigma1, pi1), X_sim, y_sim
-        )
-        bootstrap_risk_bayes_0632, bootstrap_risk_bayes_0632_plus = (
-            estimate_risk_bootstrap(
-                BayesClassifierWrapper(mu0, Sigma0, pi0, mu1, Sigma1, pi1), X_sim, y_sim
-            )
-        )
 
-        simulation_results.append(
-            {
-                "model": "Optimal Bayes",
-                "n": n,
-                "replication": r,
-                "k": None,
-                "true_risk": true_risk_bayes,
-                "cv_risk": cv_risk_bayes,
-                "bootstrap_0632_risk": bootstrap_risk_bayes_0632,
-                "bootstrap_0632_plus_risk": bootstrap_risk_bayes_0632_plus,
-            }
-        )
+        true_risk_bayes = calculate_true_risk(bayes_model, mu0, Sigma0, pi0, mu1, Sigma1, pi1)
+        cv_risk_bayes = estimate_risk_cv(BayesClassifierWrapper(mu0, Sigma0, pi0, mu1, Sigma1, pi1), X_sim, y_sim)
+        bootstrap_risk_bayes_0632, bootstrap_risk_bayes_0632_plus = estimate_risk_bootstrap(BayesClassifierWrapper(mu0, Sigma0, pi0, mu1, Sigma1, pi1), X_sim, y_sim)
 
-        # Iteramos para distintos valores de k para k-NN
+        simulation_results.append({
+            'model': 'Optimal Bayes',
+            'n': n,
+            'replication': r,
+            'k': None, 
+            'true_risk': true_risk_bayes,
+            'cv_risk': cv_risk_bayes,
+            'bootstrap_0632_risk': bootstrap_risk_bayes_0632,
+            'bootstrap_0632_plus_risk': bootstrap_risk_bayes_0632_plus
+        })
+
+
+        nb_model = GaussianNB()
+        nb_model.fit(X_sim, y_sim)
+        true_risk_nb = calculate_true_risk(nb_model, mu0, Sigma0, pi0, mu1, Sigma1, pi1)
+        cv_risk_nb = estimate_risk_cv(GaussianNB(), X_sim, y_sim)
+        bootstrap_risk_nb_0632, bootstrap_risk_nb_0632_plus = estimate_risk_bootstrap(GaussianNB(), X_sim, y_sim)
+        simulation_results.append({
+            'model': 'Naive Bayes', 'n': n, 'replication': r, 'k': None,
+            'true_risk': true_risk_nb, 'cv_risk': cv_risk_nb,
+            'bootstrap_0632_risk': bootstrap_risk_nb_0632, 'bootstrap_0632_plus_risk': bootstrap_risk_nb_0632_plus
+        })
+
+
+        lda_model = LinearDiscriminantAnalysis()
+        lda_model.fit(X_sim, y_sim)
+        true_risk_lda = calculate_true_risk(lda_model, mu0, Sigma0, pi0, mu1, Sigma1, pi1)
+        cv_risk_lda = estimate_risk_cv(LinearDiscriminantAnalysis(), X_sim, y_sim)
+        bootstrap_risk_lda_0632, bootstrap_risk_lda_0632_plus = estimate_risk_bootstrap(LinearDiscriminantAnalysis(), X_sim, y_sim)
+        simulation_results.append({
+            'model': 'LDA', 'n': n, 'replication': r, 'k': None,
+            'true_risk': true_risk_lda, 'cv_risk': cv_risk_lda,
+            'bootstrap_0632_risk': bootstrap_risk_lda_0632, 'bootstrap_0632_plus_risk': bootstrap_risk_lda_0632_plus
+        })
+
+        qda_model = QuadraticDiscriminantAnalysis()
+        qda_model.fit(X_sim, y_sim)
+        true_risk_qda = calculate_true_risk(qda_model, mu0, Sigma0, pi0, mu1, Sigma1, pi1)
+        cv_risk_qda = estimate_risk_cv(QuadraticDiscriminantAnalysis(), X_sim, y_sim)
+        bootstrap_risk_qda_0632, bootstrap_risk_qda_0632_plus = estimate_risk_bootstrap(QuadraticDiscriminantAnalysis(), X_sim, y_sim)
+        simulation_results.append({
+            'model': 'QDA', 'n': n, 'replication': r, 'k': None,
+            'true_risk': true_risk_qda, 'cv_risk': cv_risk_qda,
+            'bootstrap_0632_risk': bootstrap_risk_qda_0632, 'bootstrap_0632_plus_risk': bootstrap_risk_qda_0632_plus
+        })
+
+        knn_weighted_model = KNeighborsClassifier(n_neighbors=5, weights='distance')
+        knn_weighted_model.fit(X_sim, y_sim)
+        true_risk_knn_weighted = calculate_true_risk(knn_weighted_model, mu0, Sigma0, pi0, mu1, Sigma1, pi1)
+        cv_risk_knn_weighted = estimate_risk_cv(KNeighborsClassifier(n_neighbors=5, weights='distance'), X_sim, y_sim)
+        bootstrap_risk_knn_weighted_0632, bootstrap_risk_knn_weighted_0632_plus = estimate_risk_bootstrap(KNeighborsClassifier(n_neighbors=5, weights='distance'), X_sim, y_sim)
+        simulation_results.append({
+            'model': 'Weighted k-NN (k=5)', 'n': n, 'replication': r, 'k': 5,
+            'true_risk': true_risk_knn_weighted, 'cv_risk': cv_risk_knn_weighted,
+            'bootstrap_0632_risk': bootstrap_risk_knn_weighted_0632, 'bootstrap_0632_plus_risk': bootstrap_risk_knn_weighted_0632_plus
+        })
+
+        mu0_sim = np.mean(X_sim[y_sim == 0], axis=0)
+        mu1_sim = np.mean(X_sim[y_sim == 1], axis=0)
+        Sigma0_sim = np.cov(X_sim[y_sim == 0].T)
+        Sigma1_sim = np.cov(X_sim[y_sim == 1].T)
+        Sigma_comb_sim = (Sigma0_sim + Sigma1_sim) / 2
+
+        from numpy.linalg import inv
+
+        class FisherClassifierWrapper(BaseEstimator, ClassifierMixin):
+            def __init__(self, mu0, mu1, Sigma):
+                self.mu0 = mu0
+                self.mu1 = mu1
+                self.Sigma = Sigma
+
+            def predict(self, X):
+                Sigma_inv = inv(self.Sigma)
+                w = Sigma_inv @ (self.mu1 - self.mu0)
+
+                threshold = (w.T @ self.mu0 + w.T @ self.mu1) / 2
+                projections = X @ w
+                return (projections > threshold).astype(int)
+
+            def fit(self, X, y):
+                 self.mu0 = np.mean(X[y == 0], axis=0)
+                 self.mu1 = np.mean(X[y == 1], axis=0)
+                 Sigma0 = np.cov(X[y == 0].T)
+                 Sigma1 = np.cov(X[y == 1].T)
+                 self.Sigma = (Sigma0 + Sigma1) / 2
+                 return self
+
+            def get_params(self, deep=True):
+                return {"mu0": self.mu0, "mu1": self.mu1, "Sigma": self.Sigma}
+
+            def set_params(self, **parameters):
+                for parameter, value in parameters.items():
+                    setattr(self, parameter, value)
+                return self
+
+
+        fisher_model = FisherClassifierWrapper(mu0_sim, mu1_sim, Sigma_comb_sim)
+
+        true_risk_fisher = calculate_true_risk(fisher_model, mu0, Sigma0, pi0, mu1, Sigma1, pi1)
+
+        cv_risk_fisher = estimate_risk_cv(FisherClassifierWrapper(None, None, None), X_sim, y_sim) 
+        bootstrap_risk_fisher_0632, bootstrap_risk_fisher_0632_plus = estimate_risk_bootstrap(FisherClassifierWrapper(None, None, None), X_sim, y_sim)
+
+
+        simulation_results.append({
+            'model': 'Fisher', 'n': n, 'replication': r, 'k': None,
+            'true_risk': true_risk_fisher, 'cv_risk': cv_risk_fisher,
+            'bootstrap_0632_risk': bootstrap_risk_fisher_0632, 'bootstrap_0632_plus_risk': bootstrap_risk_fisher_0632_plus
+        })
+
+
         for k in k_values:
+            # Train k-NN
             knn_model = KNeighborsClassifier(n_neighbors=k)
             knn_model.fit(X_sim, y_sim)
 
-            true_risk_knn = calculate_true_risk(
-                knn_model, mu0, Sigma0, pi0, mu1, Sigma1, pi1
-            )
-            cv_risk_knn = estimate_risk_cv(
-                KNeighborsClassifier(n_neighbors=k), X_sim, y_sim
-            )
-            bootstrap_risk_knn_0632, bootstrap_risk_knn_0632_plus = (
-                estimate_risk_bootstrap(
-                    KNeighborsClassifier(n_neighbors=k), X_sim, y_sim
-                )
-            )
+            true_risk_knn = calculate_true_risk(knn_model, mu0, Sigma0, pi0, mu1, Sigma1, pi1)
+            cv_risk_knn = estimate_risk_cv(KNeighborsClassifier(n_neighbors=k), X_sim, y_sim)
+            bootstrap_risk_knn_0632, bootstrap_risk_knn_0632_plus = estimate_risk_bootstrap(KNeighborsClassifier(n_neighbors=k), X_sim, y_sim)
 
-            simulation_results.append(
-                {
-                    "model": "k-NN",
-                    "n": n,
-                    "replication": r,
-                    "k": k,
-                    "true_risk": true_risk_knn,
-                    "cv_risk": cv_risk_knn,
-                    "bootstrap_0632_risk": bootstrap_risk_knn_0632,
-                    "bootstrap_0632_plus_risk": bootstrap_risk_knn_0632_plus,
-                }
-            )
+            simulation_results.append({
+                'model': 'k-NN',
+                'n': n,
+                'replication': r,
+                'k': k,
+                'true_risk': true_risk_knn,
+                'cv_risk': cv_risk_knn,
+                'bootstrap_0632_risk': bootstrap_risk_knn_0632,
+                'bootstrap_0632_plus_risk': bootstrap_risk_knn_0632_plus
+            })
 
 df_simulation_results = pd.DataFrame(simulation_results)
 
